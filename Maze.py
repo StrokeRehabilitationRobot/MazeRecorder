@@ -1,5 +1,6 @@
 from pygame.locals import *
 import pygame
+import math
 import mazeBank
 
 # Colors for use throughout
@@ -22,91 +23,8 @@ PLAYERSIZE_Y = 20
 THRESHOLD = 0.05
 Y_CUTOFF = 0.35
 
-maze1 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1,
-         1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1,
-         1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1,
-         1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         ]
-
-maze2 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 1, 1,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1,
-         1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         ]
-
-maze3 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,
-         1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1,
-         1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1,
-         1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0,
-         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         ]
-
-maze4 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1,
-         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         ]
-
-maze5 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0,
-         1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1,
-         1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1,
-         1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1,
-         1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
-         1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-         1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-         ]
-
-trainer1 = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-            ]
-
 class Player:
+    # Player position is in pixels
     # Initialize player to block in second row, second column
     x = BLOCKSIZE_X + 1
     y = BLOCKSIZE_Y + 1
@@ -148,23 +66,28 @@ class Player:
         pygame.draw.rect(display_surf, GREEN,
                          (self.x, self.y, PLAYERSIZE_X, PLAYERSIZE_Y), 0)
 
+
 class Maze:
     def __init__(self):
-        self.M = 15 # number of columns
-        self.N = 12 # number of rows
-        ## SELECT MAZE NUMBER
-        self.my_mazeBank = mazeBank.mazeBank
-        self.maze = self.my_mazeBank.getMaze(self.my_mazebank, "maze2")
+        self.M = 15  # number of columns
+        self.N = 12  # number of rows
+        ## SELECT MAZE
+        self.maze = mazeBank.getmaze("maze1")
         #####################
 
     # Check if a cell is a wall or the goal (1 = wall, 2 = goal, 0 = path)
     def checkCell(self, loc_x, loc_y):
         # If the cell in the maze array is a 1, the cell is a wall
-        if self.maze[loc_x + (loc_y * self.M)] == 1:
+        if loc_x not in range(0, self.M) or loc_y not in range(0, self.N):
             return 1
-        # If the cell is not a wall, but is located in the last column, the cell is the goal
-        elif loc_x == (self.M - 1):
+        elif self.maze[loc_x + (loc_y * self.M)] == 1:
+            return 1
+        # If the cell in the maze array is a 2, the cell is the starting position
+        elif self.maze[loc_x + (loc_y * self.M)] == 2:
             return 2
+        # If the cell in the maze array is a 2, the cell is the starting position
+        elif self.maze[loc_x + (loc_y * self.M)] == 3:
+            return 3
         else:
             return 0
 
@@ -183,6 +106,41 @@ class Maze:
             if bx > self.M - 1:
                 bx = 0
                 by = by + 1
+
+    def getendpoints(self):
+        bx = 0
+        by = 0
+        # Iterate over maze array
+        for i in range(0, self.M * self.N):
+            # If an element is a '1', color it as a wall
+            if self.maze[bx + (by * self.M)] == 2:
+                start_loc = (bx, by)
+            if self.maze[bx + (by * self.M)] == 3:
+                goal_loc = (bx, by)
+            # Update iterator, and if it reaches the end of the row, increase row counter and reset column counter to 0
+            bx = bx + 1
+            if bx > self.M - 1:
+                bx = 0
+                by = by + 1
+        return start_loc, goal_loc
+
+    def neighbors_euclidean(self, loc_x, loc_y):
+        neighbors = []
+        for x in range(loc_x - 1, loc_x + 2):
+            for y in range(loc_y - 1, loc_y + 2):
+                if self.checkCell(x, y) in (0, 2, 3):
+                    neighbors.append((x, y))
+
+        return neighbors
+
+    def neighbors_manhattan(self, loc_x, loc_y):
+        neighbors_in = [(loc_x - 1, loc_y), (loc_x, loc_y + 1), (loc_x + 1, loc_y), (loc_x, loc_y - 1)]
+        neighbors_out = []
+        for option in neighbors_in:
+            if self.checkCell(option[0], option[1]) in (0, 2, 3):
+                neighbors_out.append(option)
+
+        return neighbors_out
 
 
 class App:
@@ -203,6 +161,11 @@ class App:
         pygame.display.set_caption('Pygame pythonspot.com example')
         self._running = True
         self.maze.draw(self._display_surf)
+        start_loc, end_loc = self.maze.getendpoints()
+        start_loc_pixels_x = (start_loc[0] * BLOCKSIZE_X) + math.floor(abs((BLOCKSIZE_X - PLAYERSIZE_X) * 0.5))
+        start_loc_pixels_y = (start_loc[1] * BLOCKSIZE_Y) + math.floor(abs((BLOCKSIZE_Y - PLAYERSIZE_Y) * 0.5))
+        self.player.goTo(start_loc_pixels_x, start_loc_pixels_y)
+        self.player.draw(self._display_surf)
         pygame.display.update()
 
     # Not used
