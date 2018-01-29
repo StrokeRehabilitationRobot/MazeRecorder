@@ -2,6 +2,7 @@ from pygame.locals import *
 import pygame
 import math
 import mazeBank
+import numpy
 
 # Colors for use throughout
 RED = (255,0,0)
@@ -68,11 +69,11 @@ class Player:
 
 
 class Maze:
-    def __init__(self):
+    def __init__(self, maze_name = "maze1"):
         self.M = 15  # number of columns
         self.N = 12  # number of rows
         ## SELECT MAZE
-        self.maze = mazeBank.getmaze("maze1")
+        self.maze = mazeBank.getmaze(maze_name)
         #####################
 
     # Check if a cell is a wall or the goal (1 = wall, 2 = goal, 0 = path)
@@ -101,6 +102,12 @@ class Maze:
             if self.maze[bx + (by * self.M)] == 1:
                 pygame.draw.rect(display_surf, PURPLE,
                                  (bx*BLOCKSIZE_X, by*BLOCKSIZE_Y, BLOCKSIZE_X, BLOCKSIZE_Y), 0)
+            elif self.maze[bx + (by * self.M)] == 2:
+                pygame.draw.rect(display_surf, BLUE,
+                                 (bx*BLOCKSIZE_X, by*BLOCKSIZE_Y, PLAYERSIZE_X, PLAYERSIZE_Y), 0)
+            elif self.maze[bx + (by * self.M)] == 3:
+                pygame.draw.rect(display_surf, RED,
+                                 (bx * BLOCKSIZE_X, by * BLOCKSIZE_Y, PLAYERSIZE_X, PLAYERSIZE_Y), 0)
             # Update iterator, and if it reaches the end of the row, increase row counter and reset column counter to 0
             bx = bx + 1
             if bx > self.M - 1:
@@ -148,17 +155,17 @@ class App:
     windowHeight = 600
     player = 0
 
-    def __init__(self):
+    def __init__(self, maze_name = "maze1"):
         self._running = True
         self._display_surf = None
         self.player = Player()
-        self.maze = Maze()
+        self.maze = Maze(maze_name)
 
     # Initialize game, window, maze
     def on_init(self):
         pygame.init()
         self._display_surf = pygame.display.set_mode((self.windowWidth, self.windowHeight))
-        pygame.display.set_caption('Pygame pythonspot.com example')
+        pygame.display.set_caption('Travel from Blue Square to Red Square')
         self._running = True
         self.maze.draw(self._display_surf)
         start_loc, end_loc = self.maze.getendpoints()
@@ -181,6 +188,12 @@ class App:
     def on_render(self):
         #self._display_surf.fill((0, 0, 0))
         #self.maze.draw(self._display_surf)
+        self.player.draw(self._display_surf)
+        pygame.display.update()
+
+    def on_render_full(self):
+        self._display_surf.fill((0, 0, 0))
+        self.maze.draw(self._display_surf)
         self.player.draw(self._display_surf)
         pygame.display.update()
 
@@ -208,9 +221,31 @@ class App:
             print('X value is ' + str(x_sign) + ' and direction is left')
             self.player.moveLeft(abs(x_sign))
 
-    # Execute a movement based on arm position
+    # Execute a movement based on arm position, given as a percent of the operational space, (0,0) in top left corner
     def arm_pos(self, loc_x, loc_y):
-        self.player.goTo(loc_x, loc_y)
+        grid = [loc_x*self.maze.M,loc_y*self.maze.N]
+        task_space_position = numpy.multiply(grid,[BLOCKSIZE_X, BLOCKSIZE_Y])
+        self.player.goTo(task_space_position[0], task_space_position[1])
+
+    def is_done(self):
+        start, goal = self.maze.getendpoints()
+        goal_pixels = (goal[0] * BLOCKSIZE_X, goal[1] * BLOCKSIZE_Y)
+        if abs(self.player.x - goal_pixels[0]) < PLAYERSIZE_X and abs(self.player.y - goal_pixels[1]) < PLAYERSIZE_Y:
+            print('Player is at %d, %d, Goal is at %d, %d, and that is close enough') %(self.player.x, self.player.y, goal_pixels[0], goal_pixels[1])
+            return True
+        else:
+            return False
+
+    def is_start(self):
+        start, goal = self.maze.getendpoints()
+        start_pixels = (start[0] * BLOCKSIZE_X, start[1] * BLOCKSIZE_Y)
+        if abs(self.player.x - start_pixels[0]) < PLAYERSIZE_X and abs(
+                        self.player.y - start_pixels[1]) < PLAYERSIZE_Y:
+            print('Player is at %d, %d, Start is at %d, %d, and that is close enough') % (
+            self.player.x, self.player.y, start_pixels[0], start_pixels[1])
+            return True
+        else:
+            return False
 
     # When app is called from this file, this is the execution loop
     def on_execute(self):
