@@ -30,7 +30,7 @@ baseConstants = [0.001, 0.0002, 0.01]
 shoulderConstants = [0.002, 0.00025, 0.01]
 elbowConstants = [0.002, 0.0004, 0.01]
 
-maze = Maze.App("trainer3")
+maze = Maze.App("trainer12")
 
 packet = 15*[0.0]
 
