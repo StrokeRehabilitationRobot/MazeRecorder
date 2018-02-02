@@ -71,6 +71,7 @@ class Maze:
     def __init__(self):
         self.M = 15  # number of columns
         self.N = 12  # number of rows
+        self.invert = False
         ## SELECT MAZE
         self.maze = mazeBank.getmaze("maze1")
         #####################
