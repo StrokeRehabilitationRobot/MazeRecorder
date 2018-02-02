@@ -70,6 +70,7 @@ def getmaze(mazeNo):
                   '111111111111111',
                   ],
 
+<<<<<<< HEAD
         "trainer1": ['111111111111111',
                      '111111111111111',
                      '111111111111111',
@@ -237,6 +238,7 @@ def getmaze(mazeNo):
                       '111111001111111',
                       '111111211111111',
                       ],
+
     }
     return maze_dictionary.get(mazeNo, maze_dictionary["maze1"])
 
