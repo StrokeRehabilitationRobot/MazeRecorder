@@ -23,7 +23,7 @@ def a_star(maze):
             break
 
         for next in maze.neighbors_manhattan(current[0], current[1]):
-            new_cost = cost_so_far[current] + 1
+            new_cost = cost_so_far[current] + costmove(current, next, came_from[current])
             if next not in cost_so_far:
                 cost_so_far[next] = new_cost
                 priority = new_cost + heuristic(goal, next)
@@ -31,6 +31,15 @@ def a_star(maze):
                 came_from[next] = current
     return came_from
 
+def costmove(current, next, prev):
+    if (prev is None) or (next is None):
+        return 1
+    elif (next[0] == current[0] and current[0] == prev[0]) or (next[1] == current[1] and current[1] == prev[1]):
+        print('straight')
+        return 5
+    else:
+        print('turn')
+        return 1
 
 def priority_search(maze):
     # search best options in grid first
@@ -77,6 +86,7 @@ def reconstruct_path(came_from, start, goal):
 
 
 maze = Maze.Maze()
+maze.invert()
 start, goal = maze.getendpoints()
 player = Maze.Player()
 pygame.init()
@@ -86,6 +96,8 @@ maze.draw(display_surf)
 pygame.display.update()
 
 came_from = a_star(maze)
+print start
+print came_from
 path = reconstruct_path(came_from, start, goal)
 print path
 

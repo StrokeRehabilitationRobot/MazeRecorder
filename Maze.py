@@ -1,5 +1,5 @@
-from pygame.locals import *
 import pygame
+from pygame.locals import *
 import math
 import mazeBank
 import numpy
@@ -32,7 +32,7 @@ class Player:
     prev_x = x
     prev_y = y
     ## CHANGE PLAYER SPEED HERE
-    speed = 1
+    speed = 2
     ########
 
     # Move right relative to current position, using speed modified by magnitude (mag)
@@ -70,66 +70,62 @@ class Player:
 
 class Maze:
     def __init__(self, maze_name = "maze1"):
-        self.M = 15  # number of columns
-        self.N = 12  # number of rows
-        self.invert = False
+        #self.M = 15  # number of columns
+        #self.N = 12  # number of rows
+        #self.invert = True
         ## SELECT MAZE
         self.maze = mazeBank.getmaze(maze_name)
+        self.N = len(self.maze) # number of rows
+        self.M = len(self.maze[0]) # number of columns
+
         #####################
+
+    def invert(self):
+        for index, row in enumerate(self.maze):
+            self.maze[index] = row[::-1]
 
     # Check if a cell is a wall or the goal (1 = wall, 2 = goal, 0 = path)
     def checkCell(self, loc_x, loc_y):
         # If the cell in the maze array is a 1, the cell is a wall
         if loc_x not in range(0, self.M) or loc_y not in range(0, self.N):
             return 1
-        elif self.maze[loc_x + (loc_y * self.M)] == 1:
+        elif self.maze[loc_y][loc_x] == "1":
             return 1
         # If the cell in the maze array is a 2, the cell is the starting position
-        elif self.maze[loc_x + (loc_y * self.M)] == 2:
+        elif self.maze[loc_y][loc_x] == "2":
             return 2
         # If the cell in the maze array is a 2, the cell is the starting position
-        elif self.maze[loc_x + (loc_y * self.M)] == 3:
+        elif self.maze[loc_y][loc_x] == "3":
             return 3
         else:
             return 0
 
     def draw(self, display_surf):
-        # Initialize row and columns counters
-        bx = 0
-        by = 0
-        # Iterate over maze array
-        for i in range(0, self.M * self.N):
-            # If an element is a '1', color it as a wall
-            if self.maze[bx + (by * self.M)] == 1:
-                pygame.draw.rect(display_surf, PURPLE,
-                                 (bx*BLOCKSIZE_X, by*BLOCKSIZE_Y, BLOCKSIZE_X, BLOCKSIZE_Y), 0)
-            elif self.maze[bx + (by * self.M)] == 2:
-                pygame.draw.rect(display_surf, BLUE,
-                                 (bx*BLOCKSIZE_X, by*BLOCKSIZE_Y, PLAYERSIZE_X, PLAYERSIZE_Y), 0)
-            elif self.maze[bx + (by * self.M)] == 3:
-                pygame.draw.rect(display_surf, RED,
-                                 (bx * BLOCKSIZE_X, by * BLOCKSIZE_Y, PLAYERSIZE_X, PLAYERSIZE_Y), 0)
-            # Update iterator, and if it reaches the end of the row, increase row counter and reset column counter to 0
-            bx = bx + 1
-            if bx > self.M - 1:
-                bx = 0
-                by = by + 1
+        # Iterate over maze
+        for by in range(self.N):
+            for bx in range(self.M):
+                # If an element is a '1', color it as a wall
+                if self.maze[by][bx] == "1":
+                    pygame.draw.rect(display_surf, PURPLE,
+                                     (bx * BLOCKSIZE_X, by * BLOCKSIZE_Y, BLOCKSIZE_X, BLOCKSIZE_Y), 0)
+                elif self.maze[by][bx] == "2":
+                    pygame.draw.rect(display_surf, BLUE,
+                                     (bx * BLOCKSIZE_X, by * BLOCKSIZE_Y, BLOCKSIZE_X, BLOCKSIZE_Y), 0)
+                elif self.maze[by][bx] == "3":
+                    pygame.draw.rect(display_surf, RED,
+                                     (bx * BLOCKSIZE_X, by * BLOCKSIZE_Y, BLOCKSIZE_X, BLOCKSIZE_Y), 0)
 
     def getendpoints(self):
-        bx = 0
-        by = 0
         # Iterate over maze array
-        for i in range(0, self.M * self.N):
-            # If an element is a '1', color it as a wall
-            if self.maze[bx + (by * self.M)] == 2:
-                start_loc = (bx, by)
-            if self.maze[bx + (by * self.M)] == 3:
-                goal_loc = (bx, by)
-            # Update iterator, and if it reaches the end of the row, increase row counter and reset column counter to 0
-            bx = bx + 1
-            if bx > self.M - 1:
-                bx = 0
-                by = by + 1
+        start_loc = (0, 0)
+        goal_loc = start_loc
+        for by in range(self.N):
+            for bx in range(self.M):
+                # If an element is a '1', color it as a wall
+                if self.maze[by][bx] == "2":
+                    start_loc = (bx, by)
+                if self.maze[by][bx] == "3":
+                    goal_loc = (bx, by)
         return start_loc, goal_loc
 
     def neighbors_euclidean(self, loc_x, loc_y):
@@ -156,7 +152,7 @@ class App:
     windowHeight = 600
     player = 0
 
-    def __init__(self, maze_name = "maze1"):
+    def __init__(self, maze_name="maze1"):
         self._running = True
         self._display_surf = None
         self.player = Player()
